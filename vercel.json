@@ -3,11 +3,9 @@
     "builds": [
       { "src": "index.js", "use": "@vercel/node" }
     ],
-    "env": {
-      "DATABASE_URL": "postgresql://cins_owner:******@ep-holy-dawn-a5rmvw2m-pooler.us-east-2.aws.neon.tech/cins?sslmode=require",
-      "DATABASE_URL_UNPOOLED": "postgresql://cins_owner:******@ep-holy-dawn-a5rmvw2m.us-east-2.aws.neon.tech/cins?sslmode=require",
-      "PGUSER": "cins_owner",
-      "PGPASSWORD": "teB23GRVwZAF"
-    }
+    "routes": [
+      { "src": "/user/:cpf", "dest": "index.js" },
+      { "src": "/user", "dest": "index.js" }
+    ]
   }
   

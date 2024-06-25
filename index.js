@@ -1,39 +1,36 @@
-const { Client } = require('pg');
 const express = require('express');
+const db = require('./database');
+const path = require('path');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Configuração do cliente PostgreSQL
-const client = new Client({
-  user: process.env.PGUSER,
-  password: process.env.PGPASSWORD,
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false // Apenas se necessário para conexões com SSL não autorizado
-  }
-});
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Conectar ao banco de dados Neon
-client.connect()
-  .then(() => {
-    console.log('Connected to Neon PostgreSQL database');
-  })
-  .catch(err => {
-    console.error('Error connecting to Neon PostgreSQL database:', err);
+// Rota para consultar um usuário pelo CPF
+app.get('/user/:cpf', (req, res) => {
+  const cpf = req.params.cpf;
+  db.get('SELECT * FROM users WHERE cpf = ?', [cpf], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(row);
   });
-
-// Exemplo de rota para consultar dados
-app.get('/users', async (req, res) => {
-  try {
-    const result = await client.query('SELECT * FROM users');
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error querying users:', err);
-    res.status(500).json({ error: 'Failed to retrieve users' });
-  }
 });
 
-// Iniciar o servidor
+// Rota para adicionar um novo usuário
+app.post('/user', (req, res) => {
+  const { cpf, name } = req.body;
+  db.run('INSERT INTO users (cpf, name) VALUES (?, ?)', [cpf, name], function (err) {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json({ id: this.lastID });
+  });
+});
+
+// Inicia o servidor na porta especificada
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  console.log(`Server running at http://localhost:${port}/`);
 });
