@@ -30,6 +30,7 @@ app.post('/user', (req, res) => {
   });
 });
 
+// Inicia o servidor na porta especificada
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}/`);
 });
